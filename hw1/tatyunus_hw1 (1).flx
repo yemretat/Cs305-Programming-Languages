@@ -1,0 +1,138 @@
+    int counterofline=1;
+    int determinerofcomment=0;
+
+%{
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+void processrealnumber(char *num)// It process the real numbers only
+{
+	char* ewasfound;
+	ewasfound=strchr(num,'E');//2 divide subset wheter there is "." or not
+	char* tothedot=NULL;
+	char* totheE=NULL;
+	char *tothelastitem=NULL;
+	int intfirst;
+	int intsecondpart;
+	if(ewasfound !=NULL )
+	{
+		tothedot=strtok(num,".");
+		intfirst=atoi(tothedot);//first part
+		totheE=strtok(NULL,"E");//secondpart
+		int indexholder=strlen(totheE)-1;
+		while(totheE[indexholder]=='0')
+		{
+			if(indexholder>0)
+			{
+				totheE[indexholder]='\0';
+				indexholder-=1;
+			}
+		}
+		tothelastitem=strtok(NULL,"G");//lastpart
+		intsecondpart=atoi(tothelastitem);
+		if(intfirst==0){
+			if(num[0]=='-'){
+				printf("(-%d",intfirst);}
+		}
+		else{printf("(%d",intfirst);}
+		printf(".%s",totheE);
+		printf("E%d",intsecondpart);
+		printf(")\n");
+	}
+	else
+	{
+		tothedot=strtok(num,".");
+		intfirst=atoi(tothedot);//first part
+		totheE=strtok(NULL,"G");//lastpart
+		int indexholder=strlen(totheE)-1;
+		while(totheE[indexholder]=='0')
+		{
+			if(indexholder>0)
+			{
+				totheE[indexholder]='\0';
+				indexholder-=1;
+			}
+		}
+		if(intfirst==0){
+			if(num[0]=='-'){
+				printf("(-%d",intfirst);}
+		}
+		else{printf("(%d",intfirst);}
+		printf(".%s",totheE);
+		printf(")\n");
+	}
+}
+void processintegernumber(char *num)
+{
+	char *numberpart=NULL;
+	char *afterEpart=NULL;
+	char *ewasfound=strchr(num,'E');//Evar dot yok Eyok dot yok 
+	if(ewasfound)
+	{
+		numberpart=strtok(num,"E");
+		int a=atoi(numberpart);
+		afterEpart=strtok(NULL,"E");
+		int b=atoi(afterEpart);
+		if(a==0){
+			if(num[0]=='-'){
+				printf("(-%d",a);}
+		}
+		else{printf("(%d",a);}
+		printf("E%d)",b);
+		printf("\n");
+	}
+	else
+	{
+		
+		int k=atoi(num);
+		printf("(%d)",k);
+		printf("\n");
+	}
+}
+
+%} 
+%%
+"//" determinerofcomment=1;   
+"\n" determinerofcomment=0;                      counterofline++;	
+([0-9])+(E[0-9])*[0-9]*      if(determinerofcomment==0){         printf("%d tPOSINT (%s) ",counterofline,yytext); processintegernumber(yytext);  }
+"-"([0-9])+(E[0-9])*[0-9]*    if(determinerofcomment==0){         printf("%d tNEGINT (%s) ",counterofline,yytext); processintegernumber(yytext);  }
+([0-9])+"."([0-9]+)([-E0-9])*      if(determinerofcomment==0){         printf("%d tPOSREAL (%s) ",counterofline,yytext); processrealnumber(yytext);  } 
+"-"([0-9])+"."([0-9]+)([-E0-9])*     if(determinerofcomment==0){         printf("%d tNEGREAL (%s) ",counterofline,yytext); processrealnumber(yytext);  }
+","  if(determinerofcomment==0)                   printf("%d tCOMMA\n",counterofline);     
+"("  if(determinerofcomment==0)                   printf("%d tLPAR\n",counterofline);      
+"="  if(determinerofcomment==0)                   printf("%d tASSIGNM\n",counterofline);   
+"+"  if(determinerofcomment==0)                   printf("%d tPLUS\n",counterofline);      
+"*"  if(determinerofcomment==0)                   printf("%d tSTAR\n",counterofline);      
+"<"  if(determinerofcomment==0)                   printf("%d tLT\n",counterofline);        
+">"  if(determinerofcomment==0)                   printf("%d tGT\n",counterofline);       
+"["  if(determinerofcomment==0)                   printf("%d tLBRAC\n",counterofline);     
+"&&" if(determinerofcomment==0)                   printf("%d tAND\n",counterofline);       
+".*"  if(determinerofcomment==0)                  printf("%d tDOTPROD\n",counterofline);   
+")"   if(determinerofcomment==0)                  printf("%d tRPAR\n",counterofline);      
+"-"   if(determinerofcomment==0)                  printf("%d tMINUS\n",counterofline);     
+"/"   if(determinerofcomment==0)                  printf("%d tDIV\n",counterofline);       
+";"   if(determinerofcomment==0)                  printf("%d tSEMI\n",counterofline);      
+"!="  if(determinerofcomment==0)                  printf("%d tINEQ\n",counterofline);      
+"<="  if(determinerofcomment==0)                  printf("%d tLE\n",counterofline);        
+">="  if(determinerofcomment==0)                  printf("%d tGE\n",counterofline);        
+"]"   if(determinerofcomment==0)                  printf("%d tRBRAC\n",counterofline);     
+"||"  if(determinerofcomment==0)                  printf("%d tOR\n",counterofline);        
+"int" if(determinerofcomment==0)                  printf("%d tINT\n",counterofline);       
+"real"  if(determinerofcomment==0)                printf("%d tREAL\n",counterofline);      
+"if"      if(determinerofcomment==0)              printf("%d tIF\n",counterofline);        
+"endif"    if(determinerofcomment==0)             printf("%d tENDIF\n",counterofline);     
+"vector"   if(determinerofcomment==0)             printf("%d tVECTOR\n",counterofline);    
+"matrix"    if(determinerofcomment==0)            printf("%d tMATRIX\n",counterofline);  
+" "  if(determinerofcomment==0)                   printf("");
+"\t"   if(determinerofcomment==0)                 printf("");
+"transpose"   if(determinerofcomment==0)          printf("%d tTRANSPOSE\n",counterofline); 
+[a-zA-Z_][a-zA-Z0-9_]*  if(determinerofcomment==0) printf("%d tIDENT (%s)\n",counterofline,yytext);
+
+%%
+
+
+
+main(){
+
+   yylex();
+}
